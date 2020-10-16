@@ -40,7 +40,6 @@
     "sinon": "^9.0.0"
   },
   "scripts": {
-    "prebuild": "npm run lint",
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "lint": "eslint src",
