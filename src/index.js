@@ -1,5 +1,5 @@
-import ReduxedStorage from './ReduxedStorage';
-import WrappedStorage from './WrappedStorage';
+import ReduxedStorage from "./ReduxedStorage";
+import WrappedStorage from "./WrappedStorage";
 
 /**
  * ReduxedStorage creator factory
@@ -11,34 +11,47 @@ import WrappedStorage from './WrappedStorage';
  * @returns {function(function()[, Object, function()]):Promise} a function for creating a ReduxedStorage, which in turn returns a Promise to be resolved when the ReduxedStorage is ready
  */
 export default function reduxedStorageCreatorFactory({
-  createStore, storageArea, storageKey, bufferLife
+  createStore,
+  storageArea,
+  storageKey,
+  bufferLife,
+  proxy,
 }) {
-  const msg = 'Missing or invalid argument';
+  const msg = "Missing or invalid argument";
   if (!validateStoreCreator(createStore))
     throw new Error(`(Factory) ${msg}: createStore`);
   const storage = new WrappedStorage({
-    chrome, area: storageArea, key: storageKey || 'reduxed'
+    chrome,
+    area: storageArea,
+    key: storageKey || "reduxed",
   });
   storage.init();
   return (reducer, initialState, enhancer) => {
-    if (typeof reducer !== 'function')
+    if (typeof reducer !== "function")
       throw new Error(`(StoreCreator) ${msg}: reducer`);
     const store = new ReduxedStorage({
-      createStore, storage, bufferLife,
-      reducer, initialState, enhancer
+      createStore,
+      storage,
+      bufferLife,
+      reducer,
+      initialState,
+      enhancer,
+      chrome,
+      proxy,
     });
     return store.init();
-  }
+  };
 }
 
 function validateStoreCreator(createStore) {
-  if (typeof createStore !== 'function')
-    return false;
+  if (typeof createStore !== "function") return false;
   try {
-    const store = createStore(state => state || {});
-    return typeof store === 'object' &&
-      typeof store.getState === 'function' &&
-      typeof store.dispatch === 'function';
+    const store = createStore((state) => state || {});
+    return (
+      typeof store === "object" &&
+      typeof store.getState === "function" &&
+      typeof store.dispatch === "function"
+    );
   } catch (error) {
     return false;
   }
